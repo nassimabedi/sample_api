@@ -2,45 +2,41 @@ package database
 
 import (
 	"fmt"
-	// "log"
-	// "strconv"
-
-	//"github.com/percoguru/notes-api-fiber/config"
-	"sampleApi/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"os"
+	"sampleApi/model"
+	"strconv"
 )
 
 // Declare the variable for the database
 var DB *gorm.DB
 
+// convert string to int from env
+func getenvInt(str string) (int, error) {
+	v, err := strconv.Atoi(str)
+	if err != nil {
+		return 0, err
+	}
+	return v, nil
+}
+
 // ConnectDB connect to db
 func ConnectDB() {
 	var err error
-	//p := config.Config("DB_PORT")
-	//port, err := strconv.ParseUint(p, 10, 32)
 
-	//if err != nil {
-	//	log.Println("Idiot")
-	//}
+	port, err := getenvInt(os.Getenv("DB_PORT"))
+	if err != nil {
+		panic(err)
+	}
 
 	// Connection URL to connect to Postgres Database
-	//dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", config.Config("DB_HOST"), port, config.Config("DB_USER"), config.Config("DB_PASSWORD"), config.Config("DB_NAME"))
+	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", os.Getenv("DB_HOST"),
+		port, os.Getenv("DB_USER"), os.Getenv("DB_PASS"), os.Getenv("DB_NAME"))
 
-        host:= "localhost"
-        port := 5432
-        user:= "postgres"
-        pass := "postgres"
-        dbName := "sample_api"
-
-        dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, pass, dbName)
-		// dsn := fmt.Sprintf("host=%s port=%d user=%s dbname=%s sslmode=disable", host, port, user, dbName)
 	// Connect to the DB and initialize the DB variable
 	DB, err = gorm.Open(postgres.Open(dsn))
 
-	fmt.Println("============")
-	fmt.Println(err)
-	fmt.Println("============")
 	if err != nil {
 		panic("failed to connect database")
 
